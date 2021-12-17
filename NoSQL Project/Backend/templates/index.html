@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Year</th>
+                <th scope="col">Genre</th>
+                <th scope="col">Publisher</th>
+                <th scope="col">EU_Sales</th>
+                <th scope="col">Global_Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for datas in data %}
+              <tr>
+                <td>{{ datas['Name'] }}</td>
+                <td>{{ datas['Year'] }}</td>
+                <td>{{ datas['Genre'] }}</td>
+                <td>{{ datas['Publisher'] }}</td>
+                <td>{{ str.format(datas['EU_Sales']) }}</td>
+                <td>{{ datas['Global_Sales'] }}</td>
+              </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+    </div>
+{% endblock content %}   
