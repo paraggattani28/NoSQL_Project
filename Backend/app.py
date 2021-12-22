@@ -1,16 +1,19 @@
-from bson.objectid import ObjectId
-from flask import Flask, json, render_template
-import requests
-from flask_pymongo import PyMongo
-from bson.json_util import dumps
-
-from flask import jsonify, request
+import pandas as pd
 from werkzeug.utils import redirect
+from flask import jsonify, request
+from bson.json_util import dumps
+from flask_pymongo import PyMongo
+import requests
+from flask import Flask, json, render_template
+from bson.objectid import ObjectId
+import matplotlib.pyplot as plt
+import matplotlib
 
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = "mongodb://localhost:27017/egames"
 mongo = PyMongo(app)
+
 
 @app.route('/add', methods=['POST'])
 def add_user():
@@ -23,7 +26,8 @@ def add_user():
     _global_sales = float(_json['global_sales'])
 
     if _name and _year and _genre and _publisher and _eu_sales and _global_sales and request.method == 'POST':
-        id = mongo.db.videogames.insert_one({'Name': _name, 'Year': _year, 'Genre': _genre, 'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales})
+        id = mongo.db.videogames.insert_one({'Name': _name, 'Year': _year, 'Genre': _genre,
+                                             'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales})
         resp = jsonify("Game added successfully")
         resp.status_code = 200
         return resp
@@ -31,17 +35,20 @@ def add_user():
     else:
         return not_found()
 
+
 @app.route('/games')
 def users():
     users = mongo.db.videogames.find()
     resp = dumps(users)
     return resp
 
+
 @app.route('/games/<id>')
 def user(id):
     user = mongo.db.videogames.find_one({'_id': ObjectId(id)})
     resp = dumps(user)
     return resp
+
 
 @app.route('/delete/<id>', methods=['POST', 'GET'])
 def delete_user(id):
@@ -50,6 +57,7 @@ def delete_user(id):
     resp.status_code = 200
     return redirect('/')
     return resp
+
 
 @app.route('/update/<id>', methods=['POST', 'GET'])
 def update_game(id):
@@ -63,7 +71,8 @@ def update_game(id):
         _global_sales = float(request.form['global_sales'])
 
         if _name and _year and _genre and _publisher and _eu_sales and _global_sales and request.method == 'POST':
-            id = mongo.db.videogames.update_one({'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set':  {'Name': _name, 'Year': _year, 'Genre': _genre, 'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales}})
+            id = mongo.db.videogames.update_one({'_id': ObjectId(_id['$oid']) if '$oid' in _id else ObjectId(_id)}, {'$set':  {
+                                                'Name': _name, 'Year': _year, 'Genre': _genre, 'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales}})
             resp = jsonify("Game updated successfully")
             resp.status_code = 200
             return redirect('/')
@@ -72,6 +81,8 @@ def update_game(id):
             return not_found()
 
 # Frontend
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
@@ -86,23 +97,48 @@ def index():
         _eu_sales = float(request.form['eu_sales'])
         _global_sales = float(request.form['global_sales'])
         if _name and _year and _genre and _publisher and _eu_sales and _global_sales and request.method == 'POST':
-            id = mongo.db.videogames.insert_one({'Name': _name, 'Year': _year, 'Genre': _genre, 'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales})
+            id = mongo.db.videogames.insert_one({'Name': _name, 'Year': _year, 'Genre': _genre,
+                                                 'Publisher': _publisher, 'EU_Sales': _eu_sales, 'Global_Sales': _global_sales})
             resp = jsonify("Game added successfully")
             resp.status_code = 200
             return redirect('/')
         else:
             return not_found()
+
+
+@app.route('/stats')
+def stats():
+    cursor = mongo.db.videogames.find()
+    df = pd.DataFrame(list(cursor))
+    df["EU_Sales"] = df.EU_Sales.astype(str).astype(float)
+    df["Global_Sales"] = df.Global_Sales.astype(str).astype(float)
+    df["Year"] = df.Year.astype(str).astype(float)
+    print(df)
+    plt.bar(df["Year"], df["EU_Sales"])
+    plt.xlabel("Year")
+    plt.ylabel("Europe Sales")
+    plt.savefig('Backend/static/plot1.png')
+
+    plt.bar(df["Year"], df["Global_Sales"])
+    plt.xlabel("Year")
+    plt.ylabel("Global Sales")
+    plt.savefig('Backend/static/plot2.png')
+    return render_template('stats.html')
+
+
 # End Frontend
 
+
 @app.errorhandler(404)
-def not_found(error = None):
+def not_found(error=None):
     message = {
-        'status' : 404,
-        'message' : 'Not Found '+ request.url
+        'status': 404,
+        'message': 'Not Found ' + request.url
     }
     resp = jsonify(message)
     resp.status_code = 404
     return resp
+
 
 if __name__ == "__main__":
     app.run(port=80, debug=True)
