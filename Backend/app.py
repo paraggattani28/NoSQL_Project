@@ -108,17 +108,21 @@ def index():
 
 @app.route('/stats')
 def stats():
+    # Converting data from Mongo to Pandas dataframe and cleaning
     cursor = mongo.db.videogames.find()
     df = pd.DataFrame(list(cursor))
     df["EU_Sales"] = df.EU_Sales.astype(str).astype(float)
     df["Global_Sales"] = df.Global_Sales.astype(str).astype(float)
     df["Year"] = df.Year.astype(str).astype(float)
-    print(df)
+    # print(df)
+
+    # Generating Plot 1
     plt.bar(df["Year"], df["EU_Sales"])
     plt.xlabel("Year")
     plt.ylabel("Europe Sales")
     plt.savefig('Backend/static/plot1.png')
 
+    # Generating Plot 2
     plt.bar(df["Year"], df["Global_Sales"])
     plt.xlabel("Year")
     plt.ylabel("Global Sales")
