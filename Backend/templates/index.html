@@ -1,0 +1,170 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+    </style>
+  </head>
+  <body>
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div>
+      <br>
+      <div class="container"><h1 style="color:#0074d9; font-family:Impact;"><center>Video Games Database</center></h1></div>
+      <br>
+      <div class="container" style="border-style: dotted; padding:25px;">
+        <h4 style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif"><u><center>Insert New Data Here!</center></u></h4>
+        <form action="#" method="post">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-address-card-o"></i>&nbsp;Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Name" required>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputPassword1"><i class="fa fa-calendar-o"></i>&nbsp;Year</label>
+                <input type="text" class="form-control" name="year" placeholder="Year" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-arrows" aria-hidden="true"></i>&nbsp;Genre</label>
+                <input type="text" class="form-control" name="genre" placeholder="Genre" required>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputPassword1"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;Publisher</label>
+                <input type="text" class="form-control" name="publisher" placeholder="Publisher" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputEmail1"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;EU_sales</label>
+                <input type="text" class="form-control" name="eu_sales" placeholder="EU_sales" required>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="exampleInputPassword1"><i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;Global_Sales</label>
+                <input type="text" class="form-control" name="global_sales" placeholder="Global_Sales" required>
+              </div>
+            </div>
+          </div>
+          <center><button type="submit" class="btn btn-success" style="padding-right: 10%;padding-left: 10%;">Submit</button></center>
+        </form>
+      </div>
+      <br><br>
+      <div class="container">
+        <div class="row">
+          <div class="col-6">
+        <a href="/stats"><button type="submit" class="btn btn-success">See Stats</button></a>
+          </div></div></div>
+          <br><br>
+      <div class="container">
+        <div class="conatiner"><h4 style="font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"><u><center>-- Database --</center></u></h4></div>
+        <br>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Year</th>
+                  <th scope="col">Genre</th>
+                  <th scope="col">Publisher</th>
+                  <th scope="col">EU_Sales</th>
+                  <th scope="col">Global_Sales</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {% for datas in data|reverse %}
+                  <!-- <tr onClick="location.href='/games/{{ datas['_id']['$oid'] }}';"> -->
+                <tr style="background: linear-gradient(90deg, #FFC0CB 50%, black 50%);width:25%">
+                  <td>{{ datas['Name'] }}</td>
+                  <td>{{ datas['Year'] }}</td>
+                  <td>{{ datas['Genre'] }}</td>
+                  <td>{{ datas['Publisher'] }}</td>
+                  <td>{{ datas['EU_Sales'] }}</td>
+                  <td>{{ datas['Global_Sales'] }}</td>
+                  <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modaledit{{ datas['_id']['$oid'] }}">Update</button></td>
+                  <td><a href="/delete/{{ datas['_id']['$oid'] }}"><button type="button" class="btn btn-danger">Delete</button></a></td>
+                </tr>
+                <div id="modaledit{{ datas['_id']['$oid'] }}" class="modal fade" role="dialog">
+                  <div class="modal-dialog">
+                     <div class="modal-content">
+                        <div class="modal-header">
+                           <button type="button" class="close" data-dismiss="modal">&times;</button>
+                           <h4 class="modal-title">Update Information</h4>
+                        </div>
+                        <div class="modal-body">
+                           <form action="/update/{{ datas['_id']['$oid'] }}" method="POST">
+               
+               
+                              <div class="form-group">
+                                 <label>Name:</label>
+                                 <input type="text" class="form-control" name="name" value="{{ datas['Name'] }}">
+                              </div>
+              
+                              <div class="form-group">
+                                 <label>Year:</label>
+                                 <input type="text" class="form-control" name="year" value="{{datas['Year']}}">
+                              </div>
+               
+               
+                              <div class="form-group">
+                                 <label>Genre:</label>
+                                 <input type="text" class="form-control" name="genre" value="{{datas['Genre']}}">
+                              </div>
+
+                              <div class="form-group">
+                                <label>Publisher:</label>
+                                <input type="text" class="form-control" name="publisher" value="{{datas['Publisher']}}">
+                             </div>
+
+                             <div class="form-group">
+                              <label>EU_Sales:</label>
+                              <input type="text" class="form-control" name="eu_sales" value="{{datas['EU_Sales']}}">
+                           </div>
+
+                           <div class="form-group">
+                            <label>Global_Sales:</label>
+                            <input type="text" class="form-control" name="global_sales" value="{{datas['Global_Sales']}}">
+                         </div>
+               
+               
+                              <div class="form-group">
+                                 <button class="btn btn-primary" type="submit">Update</button>
+                              </div>
+               
+               
+                           </form>
+               
+               
+                        </div>
+               
+               
+                        <div class="modal-footer">
+               
+               
+                           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+               
+               
+                        </div>
+               
+               
+                     </div>
+               
+               
+                  </div>
+                  {% endfor %}
+              </tbody>
+            </table>
+          </div>
+{% endblock content %}   
+</body>
+</html>
